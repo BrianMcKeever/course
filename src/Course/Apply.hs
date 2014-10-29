@@ -29,8 +29,8 @@ instance Apply Id where
     Id (a -> b)
     -> Id a
     -> Id b
-  (<*>) =
-    error "todo"
+  (<*>) (Id f) a =
+    f<$>a
 
 -- | Implement @Apply@ instance for @List@.
 --
@@ -41,8 +41,8 @@ instance Apply List where
     List (a -> b)
     -> List a
     -> List b
-  (<*>) =
-    error "todo"
+  (<*>) fs as =
+    flatMap (\ f -> map (\a -> f a) as) fs
 
 -- | Implement @Apply@ instance for @Optional@.
 --
@@ -59,8 +59,10 @@ instance Apply Optional where
     Optional (a -> b)
     -> Optional a
     -> Optional b
-  (<*>) =
-    error "todo"
+  (<*>) Empty _ = Empty
+  (<*>) _ Empty = Empty
+  (<*>) (Full a) (Full b) = Full $ a b
+    
 
 -- | Implement @Apply@ instance for reader.
 --
@@ -83,8 +85,8 @@ instance Apply ((->) t) where
     ((->) t (a -> b))
     -> ((->) t a)
     -> ((->) t b)
-  (<*>) =
-    error "todo"
+  (<*>) f a = (\t -> f t $ a t) 
+
 
 -- | Apply a binary function in the environment.
 --
@@ -111,8 +113,8 @@ lift2 ::
   -> f a
   -> f b
   -> f c
-lift2 =
-  error "todo"
+lift2 f a b =
+  f <$> a <*> b
 
 -- | Apply a ternary function in the environment.
 --
